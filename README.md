@@ -10,9 +10,10 @@ Designed with modern dark-themed glassmorphism aesthetics, fluid micro-animation
 
 The project has been separated into clean, decoupled files following professional frontend engineering standards:
 
-*   **`index.html`** - Holds the semantic HTML structure, SEO metadata, and includes font assets and external stylesheet/script bindings.
-*   **`styles.css`** - Custom CSS custom properties (variables), theme configuration, layout styles, and smooth transition animations.
-*   **`app.js`** - Pure JavaScript application logic containing the state engine, calculation utilities, simulation triggers, and API connections.
+*   **`index.html`** - Core dashboard layout page structure, tab control system, and configuration views.
+*   **`chart.html`** - Full-screen dedicated TradingView interactive charting view page.
+*   **`styles.css`** - Global CSS theme styles, layouts, animations, and typography configurations.
+*   **`app.js`** - Pure JavaScript state machine, calculations engine, simulation models, and live API connectors.
 
 ---
 
@@ -23,9 +24,8 @@ The project has been separated into clean, decoupled files following professiona
 *   **Market Sentiment Indicator:** Real-time analytics panel computing general market direction (Bullish / Bearish / Mixed), top daily gainer, and top daily loser.
 *   **Timer & Auto-Refresh:** Visual countdown circle counts down from 3 minutes to auto-update values silently. Manual refresh is supported at any time.
 
-### 2. Interactive Charts
-*   **TradingView Embeds:** Click on any asset row in the Market Monitor table to open a slide-out drawer from the right containing a fully interactive TradingView chart widget.
-*   **Technical Tools:** Analyze price trends using candlestick patterns, adjust timeline intervals (1D, 1W, 1M, 1H), and apply standard technical indicators like RSI and Moving Averages directly in the drawer.
+*   **Dedicated Tab View:** Click on any asset row in the Market Monitor table to launch `chart.html` in a new browser tab/window.
+*   **Full-Screen Charting:** Automatically loads the full-screen interactive TradingView charting widget for the selected asset, allowing you to use professional indicators, view real-time candlesticks, change intervals (1D, 1W, 1M, 1H), and analyze markets in a clean, distraction-free environment.
 
 ### 3. Reactive Average Calculator
 *   **Spreadsheet-style Inputs:** Dynamically add or delete purchase entry rows. Averages and outlay compute instantly on every keystroke.

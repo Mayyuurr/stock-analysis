@@ -453,37 +453,7 @@ const TV_SYMBOL_MAP = {
     "XAG/USD": "TVC:SILVER"
 };
 
-function toggleDrawer(show) {
-    const drawer = document.getElementById("chart-drawer");
-    if (show) {
-        drawer.classList.add("active");
-    } else {
-        drawer.classList.remove("active");
-    }
-}
-
 function showAssetChart(name, symbol) {
-    toggleDrawer(true);
-    document.getElementById("drawer-title").textContent = `${name} Live Chart`;
-    
     const tvSymbol = TV_SYMBOL_MAP[symbol] || symbol;
-    
-    // Clear and prepare mounting container
-    document.getElementById("chart-container").innerHTML = '<div id="tv-widget-mount" style="height: 100%;"></div>';
-    
-    // Create new widget instance
-    new TradingView.widget({
-        "width": "100%",
-        "height": "100%",
-        "symbol": tvSymbol,
-        "interval": "D",
-        "timezone": "Etc/UTC",
-        "theme": "dark",
-        "style": "1",
-        "locale": "en",
-        "enable_publishing": false,
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "container_id": "tv-widget-mount"
-    });
+    window.open(`chart.html?symbol=${encodeURIComponent(tvSymbol)}&name=${encodeURIComponent(name)}`, '_blank');
 }

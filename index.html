@@ -19,9 +19,6 @@
 
     <!-- External Stylesheet -->
     <link rel="stylesheet" href="styles.css">
-
-    <!-- TradingView Charting Library -->
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
 
@@ -235,21 +232,7 @@
         </div>
     </div>
 
-    <!-- Chart Sidebar Drawer -->
-    <div class="drawer" id="chart-drawer">
-        <div class="drawer-header">
-            <h3 id="drawer-title">Asset Chart</h3>
-            <button class="close-btn" onclick="toggleDrawer(false)">&times;</button>
-        </div>
-        <div class="drawer-body">
-            <div id="chart-container">
-                <!-- TradingView Widget mounts here -->
-            </div>
-            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(15, 23, 42, 0.3); padding: 12px; border-radius: 8px; border: 1px solid var(--border-primary);">
-                💡 <strong>TradingView Interactive Widget:</strong> Includes real-time indicators, trendlines, candles, and interval choices (1D, 1W, 1M, 1H) for deep technical analysis.
-            </div>
-        </div>
-    </div>
+
 
     <!-- External Javascript Logic -->
     <script src="app.js"></script>
