@@ -9,11 +9,10 @@ const DEFAULT_MARKET_DATA = [
   { id: 2, name: "Nasdaq 100", symbol: "IXIC", current: 17980.20, prevClose: 18090.75, change: -110.55, percent: -0.61 },
   { id: 3, name: "Hang Seng", symbol: "HSI", current: 17210.60, prevClose: 17045.00, change: 165.60, percent: 0.97 },
   { id: 4, name: "Nikkei 225", symbol: "N225", current: 38850.00, prevClose: 38620.00, change: 230.00, percent: 0.60 },
-  { id: 5, name: "Kospi", symbol: "KS11", current: 2685.30, prevClose: 2704.50, change: -19.20, percent: -0.71 },
-  { id: 6, name: "FTSE 100", symbol: "FTSE", current: 8215.10, prevClose: 8222.90, change: -7.80, percent: -0.09 },
-  { id: 7, name: "Brent Crude Oil", symbol: "LCO/USD", current: 81.25, prevClose: 83.10, change: -1.85, percent: -2.23 },
-  { id: 8, name: "Gold Spot", symbol: "XAU/USD", current: 2384.40, prevClose: 2372.10, change: 12.30, percent: 0.52 },
-  { id: 9, name: "Silver Spot", symbol: "XAG/USD", current: 29.45, prevClose: 29.20, change: 0.25, percent: 0.86 }
+  { id: 5, name: "FTSE 100", symbol: "FTSE", current: 8215.10, prevClose: 8222.90, change: -7.80, percent: -0.09 },
+  { id: 6, name: "Brent Crude Oil", symbol: "LCO/USD", current: 81.25, prevClose: 83.10, change: -1.85, percent: -2.23 },
+  { id: 7, name: "Gold Spot", symbol: "XAU/USD", current: 2384.40, prevClose: 2372.10, change: 12.30, percent: 0.52 },
+  { id: 8, name: "Silver Spot", symbol: "XAG/USD", current: 29.45, prevClose: 29.20, change: 0.25, percent: 0.86 }
 ];
 
 const REFRESH_INTERVAL_SECONDS = 180;
@@ -25,6 +24,9 @@ function Dashboard() {
     mode: localStorage.getItem('app_mode') || 'sim',
     apiKey: localStorage.getItem('twelvedata_apikey') || ''
   });
+  
+  const lastLiveFetchTimeRef = useRef(0);
+  const [liveNotice, setLiveNotice] = useState('');
   
   const [marketData, setMarketData] = useState(() => {
     // Initial math alignment on first load
@@ -109,6 +111,18 @@ function Dashboard() {
   };
 
   const fetchLiveData = async (apiKey) => {
+    const timeSinceLastFetch = Date.now() - lastLiveFetchTimeRef.current;
+    if (timeSinceLastFetch < 60000) {
+      const remainingSecs = Math.ceil((60000 - timeSinceLastFetch) / 1000);
+      setLiveNotice(`Twelve Data API limit: Safe-updating locally. Please wait ${remainingSecs}s to hit API again.`);
+      setTimeout(() => setLiveNotice(''), 5000);
+      runSimulationTick();
+      return;
+    }
+    
+    setLiveNotice('');
+    lastLiveFetchTimeRef.current = Date.now();
+
     const symbolList = marketData.map(d => d.symbol).join(',');
     const url = `https://api.twelvedata.com/quote?symbol=${symbolList}&apikey=${apiKey}`;
     
@@ -214,6 +228,26 @@ function Dashboard() {
           Config
         </button>
       </header>
+
+      {/* Floating API Rate Notice Alert */}
+      {liveNotice && (
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: '#f87171',
+          padding: '12px 18px',
+          borderRadius: '12px',
+          fontSize: '13px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          ⚠️ {liveNotice}
+        </div>
+      )}
 
       {/* Market Stats KPIs */}
       <div className="market-stats-row">
