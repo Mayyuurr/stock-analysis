@@ -1,64 +1,60 @@
-# StratBoonCo Market Intelligence Hub
+# StratBoonCo Market Intelligence Hub (React Edition)
 
-A premium-grade, modular financial intelligence dashboard combining a real-time **Global Market Monitor** (with interactive TradingView technical charting) and a reactive **Portfolio Average & target Profit Calculator**.
+A premium-grade React web application combining a real-time **Global Market Monitor** (with interactive TradingView technical charting tabs) and a reactive **Portfolio Average & target Profit Calculator**.
 
-Designed with modern dark-themed glassmorphism aesthetics, fluid micro-animations, and full responsive design.
+Built using **React 19**, **Vite**, and **React Router v6** with modern dark-themed glassmorphism CSS aesthetics and fluid transitions.
 
 ---
 
 ## 📂 Project Structure
 
-The project has been separated into clean, decoupled files following professional frontend engineering standards:
+The codebase is organized into modular React components:
 
-*   **`index.html`** - Core dashboard layout page structure, tab control system, and configuration views.
-*   **`chart.html`** - Full-screen dedicated TradingView interactive charting view page.
-*   **`styles.css`** - Global CSS theme styles, layouts, animations, and typography configurations.
-*   **`app.js`** - Pure JavaScript state machine, calculations engine, simulation models, and live API connectors.
-
----
-
-## 🌟 Key Features
-
-### 1. Global Market Monitor
-*   **Comprehensive Coverage:** Tracks major indices (Gift Nifty, Nasdaq 100, Hang Seng, Nikkei 225, Kospi, FTSE 100) and spot commodities (Brent Crude Oil, Gold, Silver).
-*   **Market Sentiment Indicator:** Real-time analytics panel computing general market direction (Bullish / Bearish / Mixed), top daily gainer, and top daily loser.
-*   **Timer & Auto-Refresh:** Visual countdown circle counts down from 3 minutes to auto-update values silently. Manual refresh is supported at any time.
-
-*   **Dedicated Tab View:** Click on any asset row in the Market Monitor table to launch `chart.html` in a new browser tab/window.
-*   **Full-Screen Charting:** Automatically loads the full-screen interactive TradingView charting widget for the selected asset, allowing you to use professional indicators, view real-time candlesticks, change intervals (1D, 1W, 1M, 1H), and analyze markets in a clean, distraction-free environment.
-
-### 3. Reactive Average Calculator
-*   **Spreadsheet-style Inputs:** Dynamically add or delete purchase entry rows. Averages and outlay compute instantly on every keystroke.
-*   **Target Selling Price:** Enter your desired profit margin (%) to compute the exact required per-share selling price and net profits.
-*   **Live Comparison:** Supply the current market price of the asset to see real-time unrealized gains or losses.
-*   **Export to CSV:** Download the entire portfolio calculations spreadsheet instantly to your local machine.
-
-### 4. Configurable Feeds
-*   **Simulated Feed:** Default mode. Runs a mathematically consistent simulation model using random walk drifts. Unlike basic mock generators, prices, absolute changes, and percent changes remain perfectly consistent:
-    $$\text{Change} = \text{Current Price} - \text{Previous Close}$$
-    $$\text{Percent Change} = \left(\frac{\text{Change}}{\text{Previous Close}}\right) \times 100$$
-*   **Live Feed:** Integrates with the **Twelve Data API** to pull real-time feeds directly from global exchanges.
+*   **`src/main.jsx`** - Application entry point. Mounts the root React tree and imports global styles.
+*   **`src/App.jsx`** - Configuration engine for page routes (`react-router-dom`).
+*   **`src/index.css`** - Global CSS rules containing our premium glassmorphism styling tokens and layout configurations.
+*   **`src/pages/Dashboard.jsx`** - Main controller page. Orchestrates tab states, refresh countdowns, and live stats calculations (Sentiment, movers).
+*   **`src/pages/ChartPage.jsx`** - Dedicated charting page loading a full-screen TradingView widget dynamically mapped from path parameters.
+*   **`src/components/MarketMonitor.jsx`** - Renders the live index rates table and progress timer.
+*   **`src/components/AverageCalculator.jsx`** - Renders the reactive portfolio calculator spreadsheet and handles CSV exporting.
+*   **`src/components/ConfigModal.jsx`** - Settings dashboard overlay.
+*   **`vanilla-backup/`** - Directory containing the original vanilla HTML/JS/CSS files.
 
 ---
 
-## 🚀 Getting Started
+## ⚙️ Available Scripts
 
-1.  Clone or download the project files onto your local machine.
-2.  Open **`index.html`** in any modern web browser (Chrome, Edge, Firefox, Safari).
+In the project directory, you can run:
 
-### Configuring Live Data (Optional)
+### `npm install`
+Installs all required dependencies (React Router, Vite, React, etc.). Run this first.
 
-1.  Sign up for a free developer API key at [twelvedata.com](https://twelvedata.com).
-2.  Open the application, and click the **Config** button in the header.
-3.  Select **Twelve Data Live** as your feed source.
-4.  Paste your API key and click **Apply Configurations**. The application will store the configuration in `localStorage` for future sessions.
+### `npm run dev`
+Runs the app in development mode at [http://localhost:5173](http://localhost:5173).
+The browser will hot-reload automatically when you save changes.
+
+### `npm run build`
+Builds the production-ready assets to the `dist/` folder.
+Vite will compile, optimize, and minify the React code.
 
 ---
 
-## 🛠️ Built With
+## 🌟 Core Functionality
 
-*   **Core:** Semantic HTML5, Vanilla JavaScript (ES6+).
-*   **Styling:** Custom CSS Variables & Flexbox/Grid layouts.
-*   **Typography:** Google Fonts (*Inter* & *Outfit*).
-*   **Interactive Charts:** TradingView Embedded Charting Widget library.
-*   **API Data Source:** Twelve Data API.
+1. **Dual-Feed Modes:**
+   - **Simulation Mode (Default):** Runs a smart mathematical random walk simulator drifting rates slightly up/down. All rates, changes, and percent changes calculate properly.
+   - **Twelve Data Live Mode:** Connects to Twelve Data REST API to fetch live rates. Paste your free API key in the **Config** settings modal (saved in browser `localStorage`).
+2. **Dynamic Calculator:** Add or remove rows instantly. Enter your target profit margin (%) to calculate average cost, expected profit, and required selling price dynamically. Optional live price comparisons show real-time paper profits/losses.
+3. **Interactive Charts:** Click any asset row in the Market Monitor to open a full-screen TradingView charting widget in a new tab.
+
+---
+
+## 🚀 How to Run Locally
+
+1. Install Node.js on your computer (if not already installed).
+2. Open terminal in the project directory and run:
+   ```bash
+   npm install
+   npm run dev
+   ```
+3. Open the browser to the local address outputted in terminal (usually `http://localhost:5173`).

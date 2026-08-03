@@ -559,14 +559,6 @@ tbody tr:hover td {
     transition: stroke-dashoffset 1s linear;
 }
 
-footer {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 10px;
-    opacity: 0.6;
-}
-
 #marketTable tbody tr {
     cursor: pointer;
     transition: background 0.2s ease;
@@ -576,3 +568,10 @@ footer {
     background: rgba(99, 102, 241, 0.08) !important;
 }
 
+footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    opacity: 0.6;
+}
