@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import MarketMonitor from '../components/MarketMonitor';
 import AverageCalculator from '../components/AverageCalculator';
 import ConfigModal from '../components/ConfigModal';
+import PercentageCalculator from '../components/PercentageCalculator';
 
 const DEFAULT_MARKET_DATA = [
   { id: 1, name: "Gift Nifty", symbol: "NIFTY", current: 22340.50, prevClose: 22285.00, change: 55.50, percent: 0.25 },
@@ -194,6 +195,15 @@ function Dashboard() {
             </svg>
             Average Calculator
           </button>
+          <button 
+            className={`tab-btn ${activeTab === 'percentage-calculator' ? 'active' : ''}`} 
+            onClick={() => setActiveTab('percentage-calculator')}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M12 4v16m8-8H4" />
+            </svg>
+            % Calculator
+          </button>
         </div>
 
         <button className="btn btn-outline" onClick={() => setIsModalOpen(true)}>
@@ -249,8 +259,10 @@ function Dashboard() {
             onManualRefresh={() => refreshData()}
             configMode={config.mode}
           />
-        ) : (
+        ) : activeTab === 'stock-calculator' ? (
           <AverageCalculator />
+        ) : (
+          <PercentageCalculator />
         )}
       </main>
 
