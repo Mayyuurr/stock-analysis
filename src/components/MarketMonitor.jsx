@@ -16,7 +16,7 @@ function MarketMonitor({ marketData, timeRemaining, refreshInterval, onManualRef
   
   const handleRowClick = (name, symbol) => {
     const tvSymbol = TV_SYMBOL_MAP[symbol] || symbol;
-    const url = `/chart/${encodeURIComponent(tvSymbol)}/${encodeURIComponent(name)}`;
+    const url = `/stock/${encodeURIComponent(tvSymbol)}`;
     window.open(url, '_blank');
   };
 

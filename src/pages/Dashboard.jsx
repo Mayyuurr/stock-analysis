@@ -3,6 +3,8 @@ import MarketMonitor from '../components/MarketMonitor';
 import AverageCalculator from '../components/AverageCalculator';
 import ConfigModal from '../components/ConfigModal';
 import PercentageCalculator from '../components/PercentageCalculator';
+import StockSearch from '../components/StockSearch';
+import { fetchStockQuote } from '../utils/apiRotator';
 
 const DEFAULT_MARKET_DATA = [
   { id: 1, name: "Gift Nifty", symbol: "NIFTY", current: 22340.50, prevClose: 22285.00, change: 55.50, percent: 0.25 },
@@ -22,7 +24,9 @@ function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [config, setConfig] = useState({
     mode: localStorage.getItem('app_mode') || 'sim',
-    apiKey: localStorage.getItem('twelvedata_apikey') || ''
+    twelveDataKey: localStorage.getItem('twelvedata_apikey') || '',
+    finnhubKey: localStorage.getItem('twelvedata_apikey_finnhub') || '',
+    alphaVantageKey: localStorage.getItem('twelvedata_apikey_alphavantage') || ''
   });
   
   const lastLiveFetchTimeRef = useRef(0);
@@ -91,8 +95,8 @@ function Dashboard() {
   const refreshData = async (currentConfig = config) => {
     setTimeRemaining(REFRESH_INTERVAL_SECONDS);
     
-    if (currentConfig.mode === 'live' && currentConfig.apiKey) {
-      await fetchLiveData(currentConfig.apiKey);
+    if (currentConfig.mode === 'live' && (currentConfig.twelveDataKey || currentConfig.finnhubKey || currentConfig.alphaVantageKey)) {
+      await fetchLiveData(currentConfig);
     } else {
       runSimulationTick();
     }
@@ -110,7 +114,7 @@ function Dashboard() {
     );
   };
 
-  const fetchLiveData = async (apiKey) => {
+  const fetchLiveData = async (currentConfig) => {
     const timeSinceLastFetch = Date.now() - lastLiveFetchTimeRef.current;
     if (timeSinceLastFetch < 60000) {
       const remainingSecs = Math.ceil((60000 - timeSinceLastFetch) / 1000);
@@ -123,36 +127,36 @@ function Dashboard() {
     setLiveNotice('');
     lastLiveFetchTimeRef.current = Date.now();
 
-    const symbolList = marketData.map(d => d.symbol).join(',');
-    const url = `https://api.twelvedata.com/quote?symbol=${symbolList}&apikey=${apiKey}`;
-    
-    try {
-      const response = await fetch(url);
-      const results = await response.json();
-      
-      if (results.status === 'error') {
-        console.error("Twelve Data API Error:", results.message);
-        alert("Twelve Data API error. Falling back to simulator. " + results.message);
-        runSimulationTick();
-        return;
-      }
+    const keys = {
+      twelveData: currentConfig.twelveDataKey,
+      finnhub: currentConfig.finnhubKey,
+      alphaVantage: currentConfig.alphaVantageKey
+    };
 
-      setMarketData(prevData =>
-        prevData.map(item => {
-          const apiData = results[item.symbol];
-          if (apiData) {
-            const current = parseFloat(apiData.close || apiData.price);
-            const change = parseFloat(apiData.change);
-            const percent = parseFloat(apiData.percent_change);
-            const prevClose = parseFloat(apiData.previous_close);
-            return { ...item, current, change, percent, prevClose };
-          }
-          return item;
-        })
-      );
-    } catch (err) {
-      console.error("Failed to connect to API:", err);
+    const updatedData = [];
+    let rotatorFailed = false;
+
+    for (const item of marketData) {
+      const quote = await fetchStockQuote(item.symbol, keys);
+      if (quote && !isNaN(quote.price)) {
+        updatedData.push({
+          ...item,
+          current: quote.price,
+          change: isNaN(quote.change) ? 0 : quote.change,
+          percent: isNaN(quote.percent) ? 0 : quote.percent,
+          prevClose: isNaN(quote.prevClose) ? item.prevClose : quote.prevClose
+        });
+      } else {
+        rotatorFailed = true;
+        break;
+      }
+    }
+
+    if (rotatorFailed || updatedData.length < marketData.length) {
+      console.warn("Rotator failed to fetch all tickers. Falling back to simulator.");
       runSimulationTick();
+    } else {
+      setMarketData(updatedData);
     }
   };
 
@@ -176,7 +180,9 @@ function Dashboard() {
   // Handle configuration updates
   const handleSaveConfig = (newConfig) => {
     localStorage.setItem('app_mode', newConfig.mode);
-    localStorage.setItem('twelvedata_apikey', newConfig.apiKey);
+    localStorage.setItem('twelvedata_apikey', newConfig.twelveDataKey);
+    localStorage.setItem('twelvedata_apikey_finnhub', newConfig.finnhubKey);
+    localStorage.setItem('twelvedata_apikey_alphavantage', newConfig.alphaVantageKey);
     setConfig(newConfig);
     refreshData(newConfig);
   };
@@ -220,13 +226,16 @@ function Dashboard() {
           </button>
         </div>
 
-        <button className="btn btn-outline" onClick={() => setIsModalOpen(true)}>
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
-            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
-          </svg>
-          Config
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <StockSearch />
+          <button className="btn btn-outline" onClick={() => setIsModalOpen(true)}>
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" />
+              <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+            </svg>
+            Config
+          </button>
+        </div>
       </header>
 
       {/* Floating API Rate Notice Alert */}

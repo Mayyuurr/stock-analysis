@@ -2,25 +2,34 @@ import React, { useState, useEffect } from 'react';
 
 function ConfigModal({ isOpen, onClose, initialConfig, onSave }) {
   const [mode, setMode] = useState(initialConfig.mode || 'sim');
-  const [apiKey, setApiKey] = useState(initialConfig.apiKey || '');
+  const [twelveDataKey, setTwelveDataKey] = useState(initialConfig.twelveDataKey || '');
+  const [finnhubKey, setFinnhubKey] = useState(initialConfig.finnhubKey || '');
+  const [alphaVantageKey, setAlphaVantageKey] = useState(initialConfig.alphaVantageKey || '');
 
   useEffect(() => {
     if (isOpen) {
       setMode(initialConfig.mode || 'sim');
-      setApiKey(initialConfig.apiKey || '');
+      setTwelveDataKey(initialConfig.twelveDataKey || '');
+      setFinnhubKey(initialConfig.finnhubKey || '');
+      setAlphaVantageKey(initialConfig.alphaVantageKey || '');
     }
   }, [isOpen, initialConfig]);
 
   if (!isOpen) return null;
 
   const handleSave = () => {
-    onSave({ mode, apiKey });
+    onSave({ 
+      mode, 
+      twelveDataKey,
+      finnhubKey,
+      alphaVantageKey
+    });
     onClose();
   };
 
   return (
     <div className="modal active" id="settings-modal">
-      <div className="modal-content">
+      <div className="modal-content" style={{ maxWidth: '520px' }}>
         <div className="modal-header">
           <h3>System Configuration</h3>
           <button className="close-btn" onClick={onClose}>&times;</button>
@@ -39,25 +48,57 @@ function ConfigModal({ isOpen, onClose, initialConfig, onSave }) {
               className={`toggle-option ${mode === 'live' ? 'active' : ''}`} 
               onClick={() => setMode('live')}
             >
-              Twelve Data Live
+              Live Multi-API
             </div>
           </div>
         </div>
 
         {mode === 'live' && (
-          <div className="form-group" id="apikey-group">
-            <label htmlFor="twelveDataKey">Twelve Data API Key</label>
-            <input 
-              type="password" 
-              id="twelveDataKey" 
-              className="calc-input" 
-              placeholder="Enter your apikey here"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-              Get a free API key in 30 seconds from <a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)' }}>twelvedata.com</a>.
-            </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '4px' }}>
+            <div className="form-group">
+              <label htmlFor="twelveDataKey">Twelve Data API Key</label>
+              <input 
+                type="password" 
+                id="twelveDataKey" 
+                className="calc-input" 
+                placeholder="Twelve Data API Key"
+                value={twelveDataKey}
+                onChange={(e) => setTwelveDataKey(e.target.value)}
+              />
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                Free key from <a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)' }}>twelvedata.com</a>.
+              </span>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="finnhubKey">Finnhub API Key</label>
+              <input 
+                type="password" 
+                id="finnhubKey" 
+                className="calc-input" 
+                placeholder="Finnhub API Token"
+                value={finnhubKey}
+                onChange={(e) => setFinnhubKey(e.target.value)}
+              />
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                Free key from <a href="https://finnhub.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)' }}>finnhub.io</a>.
+              </span>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="alphaVantageKey">Alpha Vantage API Key</label>
+              <input 
+                type="password" 
+                id="alphaVantageKey" 
+                className="calc-input" 
+                placeholder="Alpha Vantage API Key"
+                value={alphaVantageKey}
+                onChange={(e) => setAlphaVantageKey(e.target.value)}
+              />
+              <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                Free key from <a href="https://www.alphavantage.co" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-brand)' }}>alphavantage.co</a>.
+              </span>
+            </div>
           </div>
         )}
 
